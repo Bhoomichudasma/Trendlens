@@ -3,7 +3,6 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Full--Stack-MERN-blue" />
-  <img src="https://img.shields.io/badge/Deployed%20on-Render-brightgreen" />
   <img src="https://img.shields.io/badge/API-Google%20Trends%20%7C%20Reddit%20%7C%20News-orange" />
 </p>
 

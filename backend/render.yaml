@@ -2,6 +2,7 @@ services:
   - type: web
     name: trendlens-backend
     env: node
+    rootDir: backend
     plan: free
     region: oregon
     buildCommand: npm install

@@ -211,7 +211,8 @@ exports.fetchNewsArticles = async (keyword, options = {}) => {
     }
     
     // Cache the result for 2 minutes
-    cache.set(cacheKey, result, 2 * 60 * 1000);
+    // Cache results longer to avoid burning through rate limits
+    cache.set(cacheKey, result, 10 * 60 * 1000);
     
     return result;
   } catch (error) {

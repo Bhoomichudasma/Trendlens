@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_MODEL = process.env.GROQ_MODEL || 'meta-llama/llama-4-scout-17b-16e-instruct';
+const ALERT_NEWS_LIMIT = Number(process.env.ALERT_NEWS_LIMIT || 8); // keep low to avoid 429s
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -204,7 +205,11 @@ async function runAlertCheck() {
   for (const topic of topics) {
     try {
       const prevLog = await AlertLog.findOne({ topicId: topic._id }).sort({ createdAt: -1 }).lean();
-      const articles = await fetchNewsArticles(topic.keyword, { limit: 15, sortBy: 'publishedAt', time: 'week' });
+      const articles = await fetchNewsArticles(topic.keyword, {
+        limit: ALERT_NEWS_LIMIT,
+        sortBy: 'publishedAt',
+        time: 'week'
+      });
 
       if (!articles.length) { console.log(`[Alert] No articles for: ${topic.keyword}`); continue; }
 

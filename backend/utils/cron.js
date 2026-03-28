@@ -7,6 +7,16 @@ let running = false;
 let alertRunning = false;
 
 function startCron() {
+  const cronEnabled = (process.env.CRON_ENABLED || 'true').toLowerCase() !== 'false';
+  if (!cronEnabled) {
+    console.log('[Cron] Disabled via CRON_ENABLED=false');
+    return;
+  }
+
+  const startupDelayMs = Number(process.env.CRON_START_DELAY_MS || 5 * 60 * 1000); // default 5 minutes
+  console.log(`[Cron] Scheduling jobs after ${Math.round(startupDelayMs / 1000)}s delay`);
+
+  setTimeout(() => {
   // Every 30 minutes — refresh topic DNA
   cron.schedule('*/30 * * * *', async () => {
     if (running) return;
@@ -40,6 +50,7 @@ function startCron() {
       alertRunning = false;
     }
   });
+  }, startupDelayMs);
 }
 
 module.exports = { startCron };

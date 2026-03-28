@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: trendlens-backend
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+
+# Note:
+# - Cron refresh is handled in-process by `node-cron` inside the backend server.
+# - Set remaining secrets (MONGO_URI, API keys, GROQ_API_KEY, etc.) in Render dashboard env vars.
+

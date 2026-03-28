@@ -7,7 +7,8 @@ const ExportButton = ({ data, keyword }) => {
   const handleExport = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/trend/export/pdf', {
+      const apiBase = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${apiBase}/trend/export/pdf`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -15,13 +16,16 @@ const ExportButton = ({ data, keyword }) => {
         body: JSON.stringify({ keyword, data }),
       });
 
-      if (!response.ok) throw new Error('Failed to generate PDF');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to generate PDF');
+      }
 
       // Get the blob from the response
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       
-      // Create a link to download the PDF
+      // Create a download link
       const a = document.createElement('a');
       a.href = url;
       a.download = `trendlens-${keyword}-${new Date().toISOString().split('T')[0]}.pdf`;
@@ -31,7 +35,7 @@ const ExportButton = ({ data, keyword }) => {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Export Error:', error);
-      alert('Failed to export report. Please try again.');
+      alert(`Failed to export report: ${error.message}`);
     } finally {
       setLoading(false);
     }

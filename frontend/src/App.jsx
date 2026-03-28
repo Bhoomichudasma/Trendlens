@@ -1,70 +1,46 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
-
-import Dashboard from './pages/Dashboard';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BarChart3, Clock, Home } from 'lucide-react';
 import History from './pages/History';
+import LandingPage from './pages/LandingPage';
+import TopicIntelligence from './pages/TopicIntelligence';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
-function NavLink({ to, children }) {
-  const location = useLocation();
-  const isActive = location.pathname === to;
-  
-  return (
-    <Link
-      to={to}
-      className={`px-4 py-2 rounded-lg transition-all duration-200 ${
-        isActive
-          ? 'bg-blue-600 text-white shadow-md'
-          : 'text-gray-600 hover:bg-gray-100'
-      }`}
-    >
-      {children}
-    </Link>
-  );
-}
+// Import chart components to ensure they're included in the bundle
+import './components/TrendChart';
+import './components/NewsChart';
+import './components/RedditChart';
 
 function App() {
-  return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-lg px-6 py-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <svg
-                className="w-8 h-8 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
-                />
-              </svg>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-                TrendLens
-              </h1>
-            </div>
-            <div className="flex space-x-4">
-              <NavLink to="/dashboard">Dashboard</NavLink>
-              <NavLink to="/history">History</NavLink>
-            </div>
-          </div>
-        </nav>
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
-        <div className="max-w-7xl mx-auto py-6 px-4">
+  return (
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <AuthProvider>
+        <Router>
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/history" element={<History />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/dashboard" element={<Navigate to="/" replace />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/history"
+              element={
+                <ProtectedRoute>
+                  <History />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/topic/:slug" element={<TopicIntelligence />} />
           </Routes>
-        </div>
-      </div>
-    </Router>
+        </Router>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 
 export default App;
-
